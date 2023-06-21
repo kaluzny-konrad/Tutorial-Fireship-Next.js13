@@ -1,41 +1,23 @@
-import Link from "next/link";
 import React from "react";
+import { getNotes } from "@/hooks/getNotes";
+import { Note } from "@/components/notes/Note";
+import CreateNote from "@/components/notes/CreateNote";
+import styles from '@/components/notes/Notes.module.css';
 
-type Props = {};
-
-export default async function page({}: Props) {
+export default async function page() {
   const notes = await getNotes();
 
   return (
     <div>
       <h1>Notes</h1>
-      <div>
+      <div className={styles.grid}>
         {notes?.map((note) => {
           return <Note key={note.id} note={note} />;
         })}
       </div>
+
+      <CreateNote />
     </div>
   );
 }
 
-async function getNotes() {
-  const res = await fetch(
-    "http://127.0.0.1:8090/api/collections/notes/records?page=1&perPage=30",
-    { cache: "no-store" }
-  );
-  const data = await res.json();
-  return data?.items as any[];
-}
-
-function Note({ note }: any) {
-  const { id, title, content, created } = note || {};
-  return (
-    <Link href={`/notes/${id}`}>
-      <div>
-        <h2>{title}</h2>
-        <h5>{content}</h5>
-        <p>{created}</p>
-      </div>
-    </Link>
-  );
-}
